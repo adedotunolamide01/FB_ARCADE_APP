@@ -2,20 +2,14 @@ const express = require('express');
 
 const router = express.Router();
 
-app.get('/', (req, res) => {
-  res.json({ message: 'get outlet' });
-});
+const {
+  getOutlet,
+  createOutlet,
+  updateOutlet,
+  deleteOutlet,
+} = require('../controllers/outletController');
 
-app.get('/', (req, res) => {
-  res.json({ message: 'set outlet' });
-});
-
-app.post('/', (req, res) => {
-  res.json({ message: 'get outlet' });
-});
-
-app.get('/api/outlet', (req, res) => {
-  res.json({ message: 'get outlet' });
-});
+router.route('/').get(getOutlet).post(createOutlet);
+router.route('/:id').delete(deleteOutlet).put(updateOutlet);
 
 module.exports = router;

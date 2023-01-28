@@ -2,20 +2,14 @@ const express = require('express');
 
 const router = express.Router();
 
-app.get('/', (req, res) => {
-  res.json({ message: 'get outlet' });
-});
+const {
+  getTicket,
+  createTicket,
+  updateTicket,
+  deleteTicket,
+} = require('../controllers/ticketController');
 
-app.get('/', (req, res) => {
-  res.json({ message: 'set outlet' });
-});
-
-app.post('/', (req, res) => {
-  res.json({ message: 'get outlet' });
-});
-
-app.get('/api/outlet', (req, res) => {
-  res.json({ message: 'get outlet' });
-});
+router.route('/').get(getTicket).post(createTicket);
+router.route('/:id').delete(deleteTicket).post(updateTicket);
 
 module.exports = router;
