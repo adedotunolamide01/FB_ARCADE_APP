@@ -4,8 +4,7 @@ const Outlet = require('../models/outletModel');
 const createOutlet = async (req, res) => {
   try {
     const outlet = new Outlet({
-      outlet: req.body.outlet,
-      outletid: req.body.outletid,
+      outletName: req.body.outletName,
       date: req.body.date,
     });
     await outlet.save();
@@ -25,7 +24,8 @@ const getOutlet = async (req, res) => {
   }
 };
 
-// Get a single sale record by ID
+// //Get a single sale record by ID
+
 // const getTickect = async (req, res) => {
 //   try {
 //     const ticket = await Ticket.findById(req.params.id);

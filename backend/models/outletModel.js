@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const outletSchema = new Schema({
-  outlet: { type: String, required: [true, 'Please enter of the outlet'] },
-  outletid: { type: String, required: [true, 'Please enter of the outlet ID'] },
+  outletName: { type: String, required: [true, 'Please enter of the outlet'] },
   date: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Outlet', outletSchema);
+const Outlet = mongoose.model('Outlet', outletSchema);
+module.exports = Outlet;

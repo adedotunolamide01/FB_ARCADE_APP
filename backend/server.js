@@ -10,7 +10,7 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// app.get('/api/users', require('./routes/userRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/outlet', require('./routes/outletRoutes'));
 app.use('/api/ticket', require('./routes/ticketRoutes'));
 

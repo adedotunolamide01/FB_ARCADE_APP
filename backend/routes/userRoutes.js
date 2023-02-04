@@ -1,15 +1,17 @@
-// const express = require('express');
+const express = require('express');
 
-// const router = express.Router();
+const router = express.Router();
 
-// const {
-//   getSales,
-//   createSales,
-//   updateSales,
-//   delectSales,
-// } = require('../controllers/salesController');
+const {
+  registerUser,
+  getme,
+  loginUser,
+} = require('../controllers/userController');
 
-// router.route('/').get(getSales).post(createSales);
-// router.route('/:id').delete(delectSales).post(updateSales);
+const { protect } = require('../Middleware/authmiddleware');
 
-// module.exports = router;
+router.post('/', registerUser);
+router.post('/login', loginUser);
+router.get('/me', protect, getme);
+
+module.exports = router;

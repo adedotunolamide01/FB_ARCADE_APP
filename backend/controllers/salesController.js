@@ -1,12 +1,14 @@
 const asyncHandler = require('express-async-handler');
 const Sale = require('../models/salesModel');
-const outlet = require('../models/outletModel');
+const Outlet = require('../models/outletModel');
+const User = require('../models/userModel');
 
 // Create a new sale record
 const createSale = asyncHandler(async (req, res) => {
   try {
     const sales = new Sale({
-      outlet: req.body.outlet,
+      user: req.user.id,
+      outlet: req.user.outlet,
       amount: req.body.amount,
       date: req.body.date,
     });
@@ -18,10 +20,15 @@ const createSale = asyncHandler(async (req, res) => {
   }
 });
 
-// Get all sale records
+// Get all sale records By ID user
 const getSales = asyncHandler(async (req, res) => {
   try {
-    const sales = await Sale.find();
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const outletId = user.outlet;
+    const sales = await Sale.find({ outlet: outletId });
     res.json(sales);
   } catch (err) {
     res.status(500).json({ message: err.message });
