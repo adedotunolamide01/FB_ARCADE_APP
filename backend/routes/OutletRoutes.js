@@ -8,9 +8,8 @@ const {
   updateOutlet,
   deleteOutlet,
 } = require('../controllers/outletController');
-const { protect } = require('../Middleware/authmiddleware');
 
-router.route('/').get(protect, getOutlet).post(protect, createOutlet);
-router.route('/:id').delete(protect, deleteOutlet).put(protect, updateOutlet);
+router.route('/').get(getOutlet).post(createOutlet);
+router.route('/:id').delete(deleteOutlet).put(updateOutlet);
 
 module.exports = router;

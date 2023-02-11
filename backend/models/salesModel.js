@@ -13,7 +13,17 @@ const saleSchema = new Schema({
     ref: 'Outlet',
   },
   amount: { type: Number, required: true },
+
   date: { type: Date, default: Date.now },
+
+  ticket: {
+    type: Schema.Types.ObjectId,
+    ref: 'Ticket',
+  },
+  ticketCount: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model('Sale', saleSchema);
