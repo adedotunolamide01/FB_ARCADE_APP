@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Sale = require('../models/salesModel');
 const Outlet = require('../models/outletModel');
-const User = require('../models/userModel');
+const User = require('../models/adminUserModel');
 const Ticket = require('../models/ticketModel ');
 
 // Create a new sale record

@@ -5,7 +5,7 @@ import { FaUser } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { register, reset } from '../../features/auth/authSlice';
+import { register, reset } from '../../features/auth/adminAuthSlice';
 import Spinner from '../../components/Spinner';
 import AdminHeader from '../../components/Admin/AdminHeader';
 
@@ -42,7 +42,7 @@ function AdminRegister() {
     }
 
     if (isSuccess || user) {
-      navigate('/');
+      navigate('/admin_3xyftvk/dashboard');
     }
 
     dispatch(reset());

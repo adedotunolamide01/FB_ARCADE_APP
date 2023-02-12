@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import Register from './pages/ExteralUser/Register';
 import Login from './pages/ExteralUser/Login';
 import HomePage from './pages/ExteralUser/HomePage';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (

@@ -4,7 +4,7 @@ import { FaSignInAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { register, reset } from '../../features/auth/authSlice';
+import { login, reset } from '../../features/auth/authSlice';
 import Spinner from '../../components/Spinner';
 
 import Header from '../../components/ExternalUser/Header';
@@ -44,16 +44,12 @@ function Login() {
   };
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (password) {
-      toast.error('Password do not match');
-    } else {
-      const userData = {
-        email,
-        password,
-      };
-      dispatch(register(userData));
-    }
+    const userData = {
+      email,
+      password,
+    };
+
+    dispatch(login(userData));
   };
 
   if (isLoading) {
@@ -96,7 +92,7 @@ function Login() {
 
           <div className="form-group">
             <button type="submit" className="btn btn-block">
-              Sumbit
+              Login
             </button>
           </div>
         </form>

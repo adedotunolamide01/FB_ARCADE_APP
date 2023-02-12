@@ -1,13 +1,13 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('../models/userModel');
+const AdminUser = require('../models/adminUserModel');
 const asyncHandler = require('express-async-handler');
 
 // @desc    register new user
 // @route   POST /api/users
 
-const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+const adminRegisterUser = asyncHandler(async (req, res) => {
+  const { name, email, password, role, outlet } = req.body;
 
   if (!name || !email || !password || !role || !outlet) {
     res.status(400);
@@ -15,7 +15,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   //check if user exist-
-  const userExists = await User.findOne({ email });
+  const userExists = await AdminUser.findOne({ email });
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
@@ -27,13 +27,13 @@ const registerUser = asyncHandler(async (req, res) => {
   // @desc    Login new user
   // @route   POST /api/users/login
 
-  const newUser = new User({
+  const newUser = new AdminUser({
     name,
     email,
     password: hashedPassword,
     role,
-    outlets,
-    token: generateToken(User.id),
+    outlet,
+    token: generateToken(AdminUser.id),
   });
 
   await newUser.save();
@@ -47,16 +47,16 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-const loginUser = asyncHandler(async (req, res) => {
+const adminLoginUser = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const adminUser = await AdminUser.findOne({ email });
 
-    if (!user) {
+    if (!AdminUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, adminUser.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Incorrect password' });
@@ -64,21 +64,21 @@ const loginUser = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       message: 'User retrieved successfully',
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      outlet: user.outlet,
-      token: generateToken(user.id),
+      _id: adminUser.id,
+      name: adminUser.name,
+      email: adminUser.email,
+      role: adminUser.role,
+      outlet: adminUser.outlet,
+      token: generateToken(adminUser.id),
     });
   } catch (error) {
     res.status(500).json({ message: 'Invalid Credentials', error });
   }
 });
 
-const updateUser = asyncHandler(async (req, res) => {
+const adminUpdateUser = asyncHandler(async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(
+    const updatedUser = await AdminUser.findByIdAndUpdate(
       req.params.userId,
       req.body,
       { new: true }
@@ -91,16 +91,16 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteUser = asyncHandler(async (req, res) => {
+const adminDeleteUser = asyncHandler(async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.userId);
+    await AdminUser.findByIdAndDelete(req.params.userId);
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(404).json({ message: 'Failed to delete user', error });
   }
 });
 
-const getme = asyncHandler(async (req, res) => {
+const adminGetme = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
@@ -111,9 +111,9 @@ const generateToken = (id) => {
 };
 
 module.exports = {
-  registerUser,
-  loginUser,
-  getme,
-  updateUser,
-  deleteUser,
+  adminRegisterUser,
+  adminLoginUser,
+  adminGetme,
+  adminUpdateUser,
+  adminDeleteUser,
 };

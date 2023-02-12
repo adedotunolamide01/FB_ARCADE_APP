@@ -16,11 +16,11 @@ app.use(
     origin: 'http://localhost:3000',
   })
 );
-app.use('/api/admin/users', require('./routes/userRoutes'));
-app.use('/api/users', require('./routes/userRoutesEx'));
+
+app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/outlet', require('./routes/outletRoutes'));
 app.use('/api/ticket', require('./routes/ticketRoutes'));
-
+app.use('/api/adminusers', require('./routes/adminRoutes'));
 app.use('/api/sales', require('./routes/salesRoutes'));
 
 app.use(errorHandler);
