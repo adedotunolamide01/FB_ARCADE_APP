@@ -7,6 +7,7 @@ function Dashboard() {
     <div>
       <AdminHeader />
       <SalesForm />
+      hr
     </div>
   );
 }
