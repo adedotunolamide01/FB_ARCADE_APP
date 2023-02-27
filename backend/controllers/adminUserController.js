@@ -2,61 +2,65 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const AdminUser = require('../models/adminUserModel');
 const asyncHandler = require('express-async-handler');
+const dotenv = require('dotenv').config();
 
 // @desc    register new user
-// @route   POST /api/users
+// @route   POST /api/adminusers
 
 const adminRegisterUser = asyncHandler(async (req, res) => {
   const { name, email, password, role, outlet } = req.body;
 
   if (!name || !email || !password || !role || !outlet) {
     res.status(400);
-    throw new Error('Please add all fields ');
+    throw new Error('Please add all fields');
   }
+  try {
+    //check if user exist-
+    const userExists = await AdminUser.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-  //check if user exist-
-  const userExists = await AdminUser.findOne({ email });
-  if (userExists) {
-    res.status(400);
-    throw new Error('User already exists');
-  }
-  // hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+    const user = await AdminUser.create({
+      name,
+      email,
+      password,
+      role,
+      outlet,
+    });
+    const token = await user.generateAuthToken();
+    // Save user to database
+    //await user.save();
 
-  // @desc    Login new user
-  // @route   POST /api/users/login
-
-  const newUser = new AdminUser({
-    name,
-    email,
-    password: hashedPassword,
-    role,
-    outlet,
-    token: generateToken(AdminUser.id),
-  });
-
-  await newUser.save();
-  res.status(201).json({ message: 'User created successfully', user: newUser });
-
-  if (!newUser) {
-    res.status(400).json({ message: 'Failed to create user' });
-  } else {
-    res.status(500);
-    throw new Error('Invalid user data');
+    res.status(201).json({
+      message: 'User created successfully',
+      user: {
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        role: user.role,
+        outlet: user.outlet,
+      },
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Invalid user data' });
   }
 });
 
 const adminLoginUser = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
-    const adminUser = await AdminUser.findOne({ email });
+    console.log('Email:', email);
 
-    if (!AdminUser) {
+    const user = await AdminUser.findOne({ email });
+    console.log('User:', user);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, adminUser.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Incorrect password' });
@@ -64,12 +68,12 @@ const adminLoginUser = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       message: 'User retrieved successfully',
-      _id: adminUser.id,
-      name: adminUser.name,
-      email: adminUser.email,
-      role: adminUser.role,
-      outlet: adminUser.outlet,
-      token: generateToken(adminUser.id),
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      outlet: user.outlet,
+      token: user.token,
     });
   } catch (error) {
     res.status(500).json({ message: 'Invalid Credentials', error });
@@ -104,11 +108,11 @@ const adminGetme = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
-};
+// const generateToken = (id) => {
+//   return jwt.sign({ id }, process.env.JWT_SECRET, {
+//     expiresIn: '30d',
+//   });
+// };
 
 module.exports = {
   adminRegisterUser,

@@ -1,41 +1,73 @@
 const asyncHandler = require('express-async-handler');
 const Sale = require('../models/salesModel');
 const Outlet = require('../models/outletModel');
-const User = require('../models/adminUserModel');
+const AdminUser = require('../models/adminUserModel');
 const Ticket = require('../models/ticketModel ');
+const axios = require('axios');
 
-// Create a new sale record
+//
 const createSale = asyncHandler(async (req, res) => {
   try {
-    const selectedTicket = Ticket.find(
-      (ticket) => ticket._id === req.body.ticket
-    );
-    if (!selectedTicket) {
-      return res.status(400).json({ message: 'Invalid ticket selected' });
+    const adminUser = await AdminUser.findById(req.user._id);
+
+    const response = await Ticket.find({});
+
+    // Create an array to hold the new Sale objects
+    const sales = [];
+
+    // Loop through the response data to create a new Sale object for each ticket
+    for (let i = 0; i < response.length; i++) {
+      const { ticketName, ticketAmount, _id } = response[i];
+
+      console.log('body:', req.body);
+      const ticketCounts = req.body.ticketCount || {};
+      console.log('counts:', ticketCounts);
+
+      const ticketCount = parseInt(ticketCounts[_id]) || 0;
+      console.log('ticketcount:', ticketCount);
+
+      const totalCost = parseInt(ticketAmount) * ticketCount;
+      const outletId = adminUser.outlet._id;
+
+      const sale = new Sale({
+        ticketName,
+        ticketAmount,
+        ticketCount: ticketCount,
+        ticketId: _id,
+        totalCost,
+        adminUser: adminUser._id,
+        outletId,
+      });
+
+      await sale.save();
+      sales.push(sale);
+      console.log('Sales:', sale);
     }
-
-    const amount = selectedTicket.ticketAmount * req.body.ticketCount;
-
-    const sales = new Sale({
-      user: req.user.id,
-      outlet: req.user.outlet,
-      amount: req.body.amount,
-      date: req.body.date,
-      ticket: req.body.ticket,
-      ticketCount: req.body.ticketCount,
-    });
-    await sales.save();
-    res.json({ message: 'Sale record added successfully' });
+    res.json(sales);
   } catch (err) {
-    res.status(500).json({ message: err.message });
-    // res.status(500).json({ message: ' error us for' });
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 });
 
-// Get all sale records By ID user
+// // // Get a single sale record by ID
+// // const getSale = async (req, res) => {
+// //   try {
+// //     const sale = await Sale.findById(req.params.id);
+// //     if (!sale) {
+// //       return res.status(404).json({ message: 'Sale record not found' });
+// //     }
+// //     res.json(sale);
+// //   } catch (err) {
+// //     res.status(500).json({ message: err.message });
+// //   }
+// // };
+
+//Get all sale records By ID user
 const getSales = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await AdminUser.findById(req.user._id);
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -46,19 +78,6 @@ const getSales = asyncHandler(async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-// // Get a single sale record by ID
-// const getSale = async (req, res) => {
-//   try {
-//     const sale = await Sale.findById(req.params.id);
-//     if (!sale) {
-//       return res.status(404).json({ message: 'Sale record not found' });
-//     }
-//     res.json(sale);
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// };
 
 // Update a sale record by ID
 const updateSale = asyncHandler(async (req, res) => {

@@ -1,16 +1,16 @@
 import { FaSignInAlt, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, reset } from '../../features/auth/authSlice';
+import { adminlogout, reset } from '../../features/auth/adminAuthSlice';
 
 function AdminHeader() {
-  const { user } = useSelector((state) => state.auth);
+  const { adminuser } = useSelector((state) => state.adminauth);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onLogout = () => {
-    dispatch(logout());
+    dispatch(adminlogout());
     dispatch(reset());
     navigate('/admin_3xyftvk/login');
   };
@@ -18,19 +18,18 @@ function AdminHeader() {
   return (
     <header className="header">
       <div className="logo">
-        <Link to="/admin_3xyftvk/dashboard">
-          {' '}
-          <img src="/frontend/image/logo.png" alt="Foodco" />
-          Foodco
-        </Link>
+        <Link to="/admin_3xyftvk/dashboard">Foodco</Link>
       </div>
       <ul>
-        {user ? (
-          <li>
-            <button className="btn" onClick={onLogout}>
-              <FaSignOutAlt /> Logout
-            </button>
-          </li>
+        {adminuser ? (
+          <>
+            <li>
+              <button className="btn" onClick={onLogout}>
+                <FaSignOutAlt /> Logout
+              </button>
+            </li>
+            <li>{adminuser.name}</li>
+          </>
         ) : (
           <>
             <li>

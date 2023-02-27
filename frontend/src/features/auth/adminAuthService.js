@@ -1,38 +1,40 @@
 import axios from 'axios';
 
-const API_URL = '/api/adminusers';
+const API_URL = '/api/adminusers/';
 
 // Register user
-const register = async (userData) => {
+const adminregister = async (userData) => {
   const response = await axios.post(API_URL, userData);
 
   if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+    localStorage.setItem('adminuser', JSON.stringify(response.data));
   }
 
   return response.data;
 };
 
 // Login user
-const login = async (userData) => {
-  const response = await axios.post(API_URL + '/login', userData);
+const adminlogin = async (userData) => {
+  const response = await axios.post(API_URL + 'login', userData);
 
   if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+    localStorage.setItem('adminuser', JSON.stringify(response.data));
   }
 
   return response.data;
 };
 
 // Logout user
-const logout = () => {
-  localStorage.removeItem('user');
+const adminlogout = () => {
+  localStorage.removeItem('adminuser');
 };
 
 const adminAuthService = {
-  register,
-  logout,
-  login,
+  adminregister,
+  adminlogout,
+  adminlogin,
 };
+
+export { adminregister, adminlogout, adminlogin };
 
 export default adminAuthService;

@@ -5,7 +5,7 @@ import { FaUser } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { register, reset } from '../../features/auth/adminAuthSlice';
+import { adminregister, reset } from '../../features/auth/adminAuthSlice';
 import Spinner from '../../components/Spinner';
 import AdminHeader from '../../components/Admin/AdminHeader';
 
@@ -32,8 +32,8 @@ function AdminRegister() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.auth
+  const { adminuser, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.adminauth
   );
 
   useEffect(() => {
@@ -41,12 +41,12 @@ function AdminRegister() {
       toast.error(message);
     }
 
-    if (isSuccess || user) {
+    if (isSuccess || adminuser) {
       navigate('/admin_3xyftvk/dashboard');
     }
 
     dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+  }, [adminuser, isError, isSuccess, message, navigate, dispatch]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -67,7 +67,7 @@ function AdminRegister() {
         role,
         outlet,
       };
-      dispatch(register(userData));
+      dispatch(adminregister(userData));
     }
   };
 

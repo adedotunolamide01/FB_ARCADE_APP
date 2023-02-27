@@ -2,10 +2,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import adminAuthService from './adminAuthService';
 
 // Get user from localStorage
-const user = JSON.parse(localStorage.getItem('user'));
+const adminuser = JSON.parse(localStorage.getItem('adminuser'));
 
 const initialState = {
-  user: user ? user : null,
+  adminuser: adminuser ? adminuser : null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -13,11 +13,11 @@ const initialState = {
 };
 
 // Register user
-export const register = createAsyncThunk(
-  'auth/register',
-  async (user, thunkAPI) => {
+export const adminregister = createAsyncThunk(
+  'adminauth/register',
+  async (adminuser, thunkAPI) => {
     try {
-      return await adminAuthService.register(user);
+      return await adminAuthService.adminregister(adminuser);
     } catch (error) {
       const message =
         (error.response &&
@@ -31,24 +31,32 @@ export const register = createAsyncThunk(
 );
 
 // Login user
-export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
-  try {
-    return await adminAuthService.login(user);
-  } catch (error) {
-    const message =
-      (error.response && error.response.data && error.response.data.message) ||
-      error.message ||
-      error.toString();
-    return thunkAPI.rejectWithValue(message);
+export const adminlogin = createAsyncThunk(
+  'adminauth/login',
+  async (adminuser, thunkAPI) => {
+    try {
+      // return await adminAuthService.adminlogin(adminuser);
+      const response = await adminAuthService.adminlogin(adminuser);
+      console.log(response.token);
+      return response;
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
   }
-});
+);
 
-export const logout = createAsyncThunk('auth/logout', async () => {
-  await adminAuthService.logout();
+export const adminlogout = createAsyncThunk('adminauth/logout', async () => {
+  await adminAuthService.adminlogout();
 });
 
 export const adminAuthSlice = createSlice({
-  name: 'auth',
+  name: 'adminauth',
   initialState,
   reducers: {
     reset: (state) => {
@@ -60,36 +68,36 @@ export const adminAuthSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(register.pending, (state) => {
+      .addCase(adminregister.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(adminregister.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.user = action.payload;
+        state.adminuser = action.payload;
       })
-      .addCase(register.rejected, (state, action) => {
+      .addCase(adminregister.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-        state.user = null;
+        state.adminuser = null;
       })
-      .addCase(login.pending, (state) => {
+      .addCase(adminlogin.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(login.fulfilled, (state, action) => {
+      .addCase(adminlogin.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.user = action.payload;
+        state.adminuser = action.payload;
       })
-      .addCase(login.rejected, (state, action) => {
+      .addCase(adminlogin.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-        state.user = null;
+        state.adminuser = null;
       })
-      .addCase(logout.fulfilled, (state) => {
-        state.user = null;
+      .addCase(adminlogout.fulfilled, (state) => {
+        state.adminuser = null;
       });
   },
 });

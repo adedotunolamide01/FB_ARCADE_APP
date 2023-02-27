@@ -8,6 +8,7 @@ import Register from './pages/ExteralUser/Register';
 import Login from './pages/ExteralUser/Login';
 import HomePage from './pages/ExteralUser/HomePage';
 import 'react-toastify/dist/ReactToastify.css';
+import SalesForm from './pages/Admin/SalesForm';
 
 function App() {
   return (
@@ -18,10 +19,10 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-
             <Route path="/admin_3xyftvk/dashboard" element={<Dashboard />} />
             <Route path="/admin_3xyftvk/login" element={<AdminLogin />} />
             <Route path="/admin_3xyftvk/register" element={<AdminRegister />} />
+            <Route path="/admin_3xyftvk/sales" element={<SalesForm />} />
           </Routes>
         </div>
       </Router>
