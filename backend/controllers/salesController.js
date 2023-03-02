@@ -3,47 +3,110 @@ const Sale = require('../models/salesModel');
 const Outlet = require('../models/outletModel');
 const AdminUser = require('../models/adminUserModel');
 const Ticket = require('../models/ticketModel ');
+const SaleSum = require('../models/saleSum');
 const axios = require('axios');
 
-//
+// const createSale = asyncHandler(async (req, res) => {
+//   try {
+//     const adminUser = await AdminUser.findById(req.user._id);
+
+//     // Retrieve tickets associated with the sales data
+//     const ticketIds = await Promise.all(
+//       req.body.sales.map((sale) => sale.ticketId)
+//     );
+//     const tickets = await Ticket.find({ _id: { $in: ticketIds } });
+//     console.log('tickets:', tickets);
+
+//     // Create an array to hold the new Sale objects
+//     const sales = [];
+
+//     for (let i = 0; i < req.body.sales.length; i++) {
+//       const { ticketName, ticketAmount, _id } = tickets.find(
+//         (ticket) => ticket._id.toString() === req.body.sales[i].ticketId
+//       );
+//       const ticketCount = req.body.sales[i].ticketCount || 0;
+//       const totalCost = parseInt(ticketAmount) * ticketCount;
+//       const outletId = adminUser.outlet._id;
+//       //
+//       const sale = new Sale({
+//         ticketName,
+//         ticketAmount,
+//         ticketCount,
+//         ticketId: _id,
+//         totalCost,
+//         adminUser: adminUser._id,
+//         outletId,
+//       });
+//       await sale.save();
+//     }
+//     res.status(201).json({
+//       message: 'Sales created successfully',
+//       sales: sales, // Return the sales array in the response
+//     });
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send('Server Error');
+//   }
+// });
+
 const createSale = asyncHandler(async (req, res) => {
   try {
     const adminUser = await AdminUser.findById(req.user._id);
+    const outletId = adminUser.outlet._id;
+    // Retrieve tickets associated with the sales data
+    const ticketIds = await Promise.all(
+      req.body.sales.map((sale) => sale.ticketId)
+    );
+    const tickets = await Ticket.find({ _id: { $in: ticketIds } });
 
-    const response = await Ticket.find({});
-
-    // Create an array to hold the new Sale objects
+    // Create an array to hold the new Sale objects and total cost
     const sales = [];
 
-    // Loop through the response data to create a new Sale object for each ticket
-    for (let i = 0; i < response.length; i++) {
-      const { ticketName, ticketAmount, _id } = response[i];
-
-      console.log('body:', req.body);
-      const ticketCounts = req.body.ticketCount || {};
-      console.log('counts:', ticketCounts);
-
-      const ticketCount = parseInt(ticketCounts[_id]) || 0;
-      console.log('ticketcount:', ticketCount);
-
+    for (let i = 0; i < req.body.sales.length; i++) {
+      const { ticketName, ticketAmount, _id } = tickets.find(
+        (ticket) => ticket._id.toString() === req.body.sales[i].ticketId
+      );
+      const ticketCount = req.body.sales[i].ticketCount || 0;
       const totalCost = parseInt(ticketAmount) * ticketCount;
-      const outletId = adminUser.outlet._id;
 
-      const sale = new Sale({
+      // const sale = new Sale({
+      //   ticketName,
+      //   ticketAmount,
+      //   ticketCount,
+      //   ticketId: _id,
+      //   totalCost,
+      //   adminUser: adminUser._id,
+      //   outletId,
+      // });
+      const sale = await Sale.create({
         ticketName,
         ticketAmount,
-        ticketCount: ticketCount,
+        ticketCount,
         ticketId: _id,
         totalCost,
         adminUser: adminUser._id,
         outletId,
       });
 
-      await sale.save();
       sales.push(sale);
-      console.log('Sales:', sale);
     }
-    res.json(sales);
+    // await Sale.insertMany(sales);
+
+    // Create a TotalSum
+    // const totalSum = parseInt(req.body.totalCost);
+    // const saleSum = await SaleSum.create({
+    //   totalSum: totalSum,
+    //   adminUser: adminUser._id,
+    //   outletId: adminUser.outlet._id,
+    // });
+
+    // await saleSum.save();
+
+    res.status(201).json({
+      message: 'Sales created successfully',
+      sales: sales,
+      // saleSum: saleSum,
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

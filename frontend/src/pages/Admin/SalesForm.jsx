@@ -1,3 +1,4 @@
+// export default SalesForm;
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,40 +14,35 @@ const SalesForm = () => {
   const dispatch = useDispatch();
 
   const { adminuser } = useSelector((state) => state.adminauth);
-  const { isLoading, isError, message } = useSelector((state) => state.sale);
+  const { isLoading, isError } = useSelector((state) => state.sale);
 
   useEffect(() => {
-    // if (!adminusers) {
-    //   navigate('admin_3xyftvk/login');
-    // }
-    if (adminuser) {
-      dispatch(createSale());
-    } else {
-      navigate('admin_3xyftvk/login');
+    if (!adminuser) {
+      navigate('/admin_3xyftvk/login');
     }
     dispatch(reset());
-  }, [dispatch, isError, message, navigate, adminuser]);
+  }, [adminuser, dispatch, navigate]);
 
   const [tickets, setTickets] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/ticket')
-      .then((res) => {
-        setTickets(
-          res.data.map((ticket) => ({
-            ...ticket,
-            ticketCount: '',
-            totalCost: 0,
-          }))
-        );
-      })
-      .catch((error) => {
+    const fetchTickets = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/ticket');
+        const data = response.data.map((ticket) => ({
+          ...ticket,
+          ticketCount: '',
+          totalCost: 0,
+        }));
+        setTickets(data);
+      } catch (error) {
         console.error(error);
         setFormError('Failed to load tickets');
-      });
+      }
+    };
+    fetchTickets();
   }, []);
 
   const calculateTotalCost = (tickets) => {
@@ -57,6 +53,7 @@ const SalesForm = () => {
     const newTickets = [...tickets];
 
     const ticketCount = parseInt(e.target.value);
+
     if (ticketCount < 1 || isNaN(ticketCount)) {
       setFormError('Please enter a valid ticket count');
       return;
@@ -65,50 +62,56 @@ const SalesForm = () => {
     newTickets[index].ticketCount = ticketCount;
     newTickets[index].totalCost = newTickets[index].ticketAmount * ticketCount;
     setTickets(newTickets);
-    setTotalCost(calculateTotalCost(newTickets));
+    const totalCost = calculateTotalCost(newTickets);
+    setTotalCost(totalCost);
     setFormError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if any ticket count is empty
     if (tickets.some((ticket) => ticket.ticketCount === '')) {
       setFormError('Please enter ticket counts for all tickets');
       return;
     }
 
-    // Get token from store
-    const token = await adminuser.token;
-    console.log('token:', token);
-
-    try {
-      const salesData = tickets.map((ticket) => ({
+    // Create sales data object
+    const salesData = {
+      sales: tickets.map((ticket) => ({
         ticketName: ticket.ticketName,
         ticketAmount: ticket.ticketAmount,
         ticketId: ticket._id,
-        ticketCount: ticket.ticketCount,
-        totalCost: ticket.totalCost,
-        adminUser: adminuser._id,
-        outletId: adminuser.outlet,
-      }));
+        ticketCount: Number(ticket.ticketCount) || 0,
+      })),
+      adminUser: adminuser._id,
+      outletId: adminuser.outlet,
+    };
+    console.log('salesData frontend :', salesData);
 
-      // Set authorization header
+    // Calculate total cost
+    let totalCost = 0;
+    for (let i = 0; i < salesData.sales.length; i++) {
+      totalCost +=
+        salesData.sales[i].ticketAmount * salesData.sales[i].ticketCount;
+    }
+
+    salesData.totalCost = totalCost;
+
+    try {
+      const token = await adminuser.token;
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      for (let i = 0; i < salesData.length; i++) {
-        const res = await axios.post(
-          'http://localhost:5000/api/sales',
-          salesData[i]
-        );
-        dispatch(createSale(res.data));
-      }
-      // reset form and state
-      setTickets(
-        tickets.map((ticket) => ({
-          ...ticket,
-          ticketCount: '',
-          totalCost: 0,
-        }))
+      // Make API call to create sales
+      const response = await axios.post(
+        'http://localhost:5000/api/sales',
+        salesData
       );
+
+      dispatch(createSale(response.data));
+
+      // Reset form
+      setTickets(tickets.map((ticket) => ({ ...ticket, ticketCount: '' })));
       setTotalCost(0);
       setFormError('');
     } catch (error) {
@@ -116,6 +119,7 @@ const SalesForm = () => {
       setFormError('Failed to submit sales data');
     }
   };
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -124,10 +128,11 @@ const SalesForm = () => {
     <>
       <AdminHeader />
       <section className="heading">
-        <h1>Welcome {adminuser && adminuser.name && adminuser._id}</h1>
+        <h1>Welcome {adminuser && adminuser.name}</h1>
         <p>Sales Input Dashboard</p>
       </section>
       <SideList />
+      {isError && <p>Failed to load data.</p>}
       {formError && <p>{formError}</p>}
       <form onSubmit={handleSubmit}>
         <div>
@@ -139,12 +144,15 @@ const SalesForm = () => {
               <input
                 type="number"
                 id={`ticketCount-${index}`}
+                name={`ticketCount-${index}`}
                 value={ticket.ticketCount}
-                onChange={handleTicketCountChange(index)}
+                onChange={(e) => handleTicketCountChange(index)(e)}
+                min={1}
               />
             </div>
           ))}
         </div>
+        {totalCost === 0 && <p>Please purchase at least one ticket.</p>}
         <p>Total Cost: {totalCost}</p>
         <button type="submit">Submit</button>
       </form>
