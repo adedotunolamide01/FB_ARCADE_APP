@@ -55,7 +55,6 @@ export const createSale = createAsyncThunk(
   async (saleData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().adminauth.adminuser.token;
-      console.log(token);
       return await saleService.createSale(saleData, token);
     } catch (error) {
       const message =

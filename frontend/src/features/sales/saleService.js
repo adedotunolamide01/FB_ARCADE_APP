@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/sales/';
+const API_URL = 'http://localhost:5000/api/sales';
 
 const createSale = async (saleData, token) => {
   const config = {

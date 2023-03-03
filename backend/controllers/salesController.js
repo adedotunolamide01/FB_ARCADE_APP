@@ -69,15 +69,6 @@ const createSale = asyncHandler(async (req, res) => {
       const ticketCount = req.body.sales[i].ticketCount || 0;
       const totalCost = parseInt(ticketAmount) * ticketCount;
 
-      // const sale = new Sale({
-      //   ticketName,
-      //   ticketAmount,
-      //   ticketCount,
-      //   ticketId: _id,
-      //   totalCost,
-      //   adminUser: adminUser._id,
-      //   outletId,
-      // });
       const sale = await Sale.create({
         ticketName,
         ticketAmount,
@@ -93,19 +84,22 @@ const createSale = asyncHandler(async (req, res) => {
     // await Sale.insertMany(sales);
 
     // Create a TotalSum
-    // const totalSum = parseInt(req.body.totalCost);
-    // const saleSum = await SaleSum.create({
-    //   totalSum: totalSum,
-    //   adminUser: adminUser._id,
-    //   outletId: adminUser.outlet._id,
-    // });
+    const totalSum = parseInt(req.body.totalCost);
+    if (isNaN(totalSum)) {
+      throw new Error('masterschool');
+    }
+    const saleSum = await SaleSum.create({
+      totalSum: totalSum,
+      adminUser: adminUser._id,
+      outletId: adminUser.outlet._id,
+    });
 
-    // await saleSum.save();
+    await saleSum.save();
 
     res.status(201).json({
       message: 'Sales created successfully',
       sales: sales,
-      // saleSum: saleSum,
+      saleSum: saleSum,
     });
   } catch (err) {
     console.error(err.message);

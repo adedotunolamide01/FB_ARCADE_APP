@@ -82,7 +82,7 @@ const SalesForm = () => {
         ticketName: ticket.ticketName,
         ticketAmount: ticket.ticketAmount,
         ticketId: ticket._id,
-        ticketCount: Number(ticket.ticketCount) || 0,
+        ticketCount: parseInt(ticket.ticketCount) || 0,
       })),
       adminUser: adminuser._id,
       outletId: adminuser.outlet,
@@ -100,15 +100,16 @@ const SalesForm = () => {
 
     try {
       const token = await adminuser.token;
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       // Make API call to create sales
-      const response = await axios.post(
-        'http://localhost:5000/api/sales',
-        salesData
-      );
+      // const response = await axios.post(
+      //   'http://localhost:5000/api/sales',
+      //   salesData
+      // );
 
-      dispatch(createSale(response.data));
+      // dispatch(createSale(response.data));
+      dispatch(createSale(salesData));
 
       // Reset form
       setTickets(tickets.map((ticket) => ({ ...ticket, ticketCount: '' })));
@@ -138,9 +139,8 @@ const SalesForm = () => {
         <div>
           {tickets.map((ticket, index) => (
             <div key={index}>
-              <h2>{ticket.ticketName}</h2>
-              <p>{ticket.ticketAmount}</p>
-              <label htmlFor={`ticketCount-${index}`}>Number of Tickets:</label>
+              <h2>Ticket Price: {ticket.ticketAmount}</h2>
+              <label htmlFor={`ticketCount-${index}`}>Ticket Count:</label>
               <input
                 type="number"
                 id={`ticketCount-${index}`}

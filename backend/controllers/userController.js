@@ -49,9 +49,12 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
+    // find from external user database
     const user = await User.findOne({ email });
-
+    
+//find from admin user database
     if (!user) {
+      
       const adminUser = await AdminUser.findOne({ email });
       if (!adminUser) {
         return res
