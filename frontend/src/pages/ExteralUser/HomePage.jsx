@@ -1,5 +1,5 @@
 import React from 'react';
-import Dashboards from '../../components/Admin/Dashboards';
+// import Dashboards from '../../components/Admin/';
 import Header from '../../components/ExternalUser/Header';
 
 function HomePage() {
@@ -7,7 +7,8 @@ function HomePage() {
     <div>
       <Header />
       <>USER HOMEPAGE</>
-      <Dashboards />
+      <h1 className="underline text-3xl"> app</h1>
+      {/* <Dashboards /> */}
     </div>
   );
 }

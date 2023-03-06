@@ -6,49 +6,6 @@ const Ticket = require('../models/ticketModel ');
 const SaleSum = require('../models/saleSum');
 const axios = require('axios');
 
-// const createSale = asyncHandler(async (req, res) => {
-//   try {
-//     const adminUser = await AdminUser.findById(req.user._id);
-
-//     // Retrieve tickets associated with the sales data
-//     const ticketIds = await Promise.all(
-//       req.body.sales.map((sale) => sale.ticketId)
-//     );
-//     const tickets = await Ticket.find({ _id: { $in: ticketIds } });
-//     console.log('tickets:', tickets);
-
-//     // Create an array to hold the new Sale objects
-//     const sales = [];
-
-//     for (let i = 0; i < req.body.sales.length; i++) {
-//       const { ticketName, ticketAmount, _id } = tickets.find(
-//         (ticket) => ticket._id.toString() === req.body.sales[i].ticketId
-//       );
-//       const ticketCount = req.body.sales[i].ticketCount || 0;
-//       const totalCost = parseInt(ticketAmount) * ticketCount;
-//       const outletId = adminUser.outlet._id;
-//       //
-//       const sale = new Sale({
-//         ticketName,
-//         ticketAmount,
-//         ticketCount,
-//         ticketId: _id,
-//         totalCost,
-//         adminUser: adminUser._id,
-//         outletId,
-//       });
-//       await sale.save();
-//     }
-//     res.status(201).json({
-//       message: 'Sales created successfully',
-//       sales: sales, // Return the sales array in the response
-//     });
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send('Server Error');
-//   }
-// });
-
 const createSale = asyncHandler(async (req, res) => {
   try {
     const adminUser = await AdminUser.findById(req.user._id);
@@ -81,12 +38,11 @@ const createSale = asyncHandler(async (req, res) => {
 
       sales.push(sale);
     }
-    // await Sale.insertMany(sales);
 
     // Create a TotalSum
     const totalSum = parseInt(req.body.totalCost);
     if (isNaN(totalSum)) {
-      throw new Error('masterschool');
+      throw new Error('totalsum is a NaN');
     }
     const saleSum = await SaleSum.create({
       totalSum: totalSum,

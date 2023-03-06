@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { createSale } from '../../features/sales/saleSlice';
-import { reset } from '../../features/auth/adminAuthSlice';
-import AdminHeader from '../../components/Admin/AdminHeader';
-import SideList from '../../components/Admin/Sidebar';
-import Spinner from '../../components/Spinner';
+import { createSale } from '../../../features/sales/saleSlice';
+import { reset } from '../../../features/auth/adminAuthSlice';
+import AdminHeader from '../../../components/Admin/AdminHeader/AdminHeader';
+// import SideList from '../../../components/Admin/Sidebar/Sidebair';
+import Spinner from '../../../components/Spinner';
+import './SalesForm.css';
 
 const SalesForm = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const SalesForm = () => {
       navigate('/admin_3xyftvk/login');
     }
     dispatch(reset());
-  }, [adminuser, dispatch, navigate]);
+  }, [adminuser, dispatch, navigate, isLoading]);
 
   const [tickets, setTickets] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
@@ -99,16 +100,6 @@ const SalesForm = () => {
     salesData.totalCost = totalCost;
 
     try {
-      const token = await adminuser.token;
-      // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      // Make API call to create sales
-      // const response = await axios.post(
-      //   'http://localhost:5000/api/sales',
-      //   salesData
-      // );
-
-      // dispatch(createSale(response.data));
       dispatch(createSale(salesData));
 
       // Reset form
@@ -120,6 +111,14 @@ const SalesForm = () => {
       setFormError('Failed to submit sales data');
     }
   };
+  const today = new Date();
+  const options = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  const formattedDate = today.toLocaleDateString('en-US', options);
 
   if (isLoading) {
     return <Spinner />;
@@ -127,35 +126,59 @@ const SalesForm = () => {
 
   return (
     <>
-      <AdminHeader />
-      <section className="heading">
-        <h1>Welcome {adminuser && adminuser.name}</h1>
-        <p>Sales Input Dashboard</p>
-      </section>
-      <SideList />
-      {isError && <p>Failed to load data.</p>}
-      {formError && <p>{formError}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          {tickets.map((ticket, index) => (
-            <div key={index}>
-              <h2>Ticket Price: {ticket.ticketAmount}</h2>
-              <label htmlFor={`ticketCount-${index}`}>Ticket Count:</label>
-              <input
-                type="number"
-                id={`ticketCount-${index}`}
-                name={`ticketCount-${index}`}
-                value={ticket.ticketCount}
-                onChange={(e) => handleTicketCountChange(index)(e)}
-                min={1}
-              />
-            </div>
-          ))}
+      <div className="container">
+        <AdminHeader />
+        <section class="heading">
+          <h2>Input Daily Sales {formattedDate}</h2>
+        </section>
+
+        <div class="form-container">
+          <div class="sidelist-container">{/* <SideList /> */}</div>
+
+          <div class="form-content">
+            <form class="sales-form" onSubmit={handleSubmit}>
+              <div class="tickets-container">
+                {tickets.map((ticket, index) => (
+                  <div class="ticket" key={index}>
+                    <h2 class="ticket-amount">
+                      Arcade Ticket #{ticket.ticketAmount}
+                    </h2>
+                    <label
+                      class="ticket-label"
+                      for={`ticketCount-${index}`}
+                    ></label>
+                    <input
+                      class="ticket-input"
+                      type="number"
+                      id={`ticketCount-${index}`}
+                      name={`ticketCount-${index}`}
+                      value={ticket.ticketCount}
+                      onChange={(e) => handleTicketCountChange(index)(e)}
+                      min={0}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div class="total-cost-container">
+                {totalCost === 0 && (
+                  <p class="total-cost-message">
+                    Please purchase at least one ticket.
+                  </p>
+                )}
+                <p class="total-cost">Total Cost: {totalCost}</p>
+              </div>
+
+              <button class="submit-button" type="submit">
+                Submit
+              </button>
+            </form>
+
+            {isError && <p class="error-message">Failed to load data.</p>}
+            {formError && <p class="error-message">{formError}</p>}
+          </div>
         </div>
-        {totalCost === 0 && <p>Please purchase at least one ticket.</p>}
-        <p>Total Cost: {totalCost}</p>
-        <button type="submit">Submit</button>
-      </form>
+      </div>
     </>
   );
 };

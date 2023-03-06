@@ -1,0 +1,39 @@
+.Sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #e3e6e4;
+  overflow-x: hidden;
+  padding-top: 20px;
+  margin-top: 80px;
+  margin-left: 370px;
+  border-right: 1px solid #e5e7eb;
+  height: 100vh;
+  width: 200px;
+}
+
+.Sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.Sidebar li {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.Sidebar li:last-child {
+  border-bottom: none;
+}
+
+.Sidebar li a {
+  color: #374151;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.Sidebar li a:hover {
+  color: #45e95d;
+}

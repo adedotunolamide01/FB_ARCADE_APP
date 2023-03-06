@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import AdminHeader from '../../components/Admin/AdminHeader';
-import Sidebar from '../../components/Admin/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import './Dashboard.css';
+import AdminHeader from '../../../components/Admin/AdminHeader/AdminHeader';
 
 function Dashboard() {
   const { adminuser } = useSelector((state) => state.adminauth);
@@ -16,11 +16,8 @@ function Dashboard() {
 
   return (
     <div>
-      <div>
-        <AdminHeader />
-      </div>
-      <Sidebar />
-      <h1>Backend Dashboard</h1>
+      <AdminHeader />
+      <h1> bashboard</h1>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { FaSignInAlt, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { adminlogout, reset } from '../../features/auth/adminAuthSlice';
+import { adminlogout, reset } from '../../../features/auth/adminAuthSlice';
+import './AdminHeader.css';
 
 function AdminHeader() {
   const { adminuser } = useSelector((state) => state.adminauth);

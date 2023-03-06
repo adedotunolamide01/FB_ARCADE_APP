@@ -29,8 +29,6 @@ const adminRegisterUser = asyncHandler(async (req, res) => {
       outlet,
     });
     const token = await user.generateAuthToken();
-    // Save user to database
-    //await user.save();
 
     res.status(201).json({
       message: 'User created successfully',
@@ -52,10 +50,9 @@ const adminRegisterUser = asyncHandler(async (req, res) => {
 const adminLoginUser = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Email:', email);
 
     const user = await AdminUser.findOne({ email });
-    console.log('User:', user);
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -107,12 +104,6 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
 const adminGetme = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
-
-// const generateToken = (id) => {
-//   return jwt.sign({ id }, process.env.JWT_SECRET, {
-//     expiresIn: '30d',
-//   });
-// };
 
 module.exports = {
   adminRegisterUser,
